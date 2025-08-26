@@ -1,0 +1,2545 @@
+
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Analisis Personaliti IASME - Numerologi & MBTI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            --secondary-gradient: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            --success-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
+            --warning-gradient: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            --dark-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --bg-glass: rgba(51, 65, 85, 0.3);
+            
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-accent: #60a5fa;
+            --text-muted: #94a3b8;
+            
+            --border-color: rgba(51, 65, 85, 0.4);
+            --border-accent: rgba(59, 130, 246, 0.5);
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --border-radius-sm: 6px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-xl: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(30, 64, 175, 0.15) 0%, transparent 50%),
+                linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .cosmic-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: var(--text-accent);
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;
+            opacity: 0.4;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+            50% { transform: translateY(-10px) rotate(180deg); opacity: 0.6; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 50px 40px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-xl);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            opacity: 0.6;
+            animation: shimmer 6s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .analysis-selector {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-lg);
+            padding: 8px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .selector-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 16px 24px;
+            border: none;
+            border-radius: var(--border-radius-md);
+            background: var(--bg-glass);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-gradient);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--border-accent);
+            transform: translateY(-1px);
+        }
+
+        .form-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-xl);
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+
+        .form-section:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--border-accent);
+        }
+
+        .section-title {
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--text-accent);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+            outline: none;
+            background: var(--bg-card);
+        }
+
+        .form-group input::placeholder {
+            color: #94a3b8;
+            opacity: 1;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px 24px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: var(--border-radius-lg);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Export Button Styles */
+        .export-btn {
+            width: auto;
+            padding: 12px 20px;
+            background: var(--success-gradient);
+            margin: 10px 0;
+            text-transform: none;
+            font-size: 1rem;
+            border-radius: var(--border-radius-md);
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* MBTI Quiz Styles */
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: var(--dark-gradient);
+            border-radius: var(--border-radius-lg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .quiz-progress {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-glass);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .question-number {
+            color: #60a5fa;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .answer-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .answer-option input[type="radio"] {
+            display: none;
+        }
+
+        .answer-option label {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #475569;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #e2e8f0;
+            background: var(--bg-glass);
+        }
+
+        .answer-option input[type="radio"]:checked + label {
+            border-color: var(--text-accent);
+            background: var(--text-accent);
+            color: var(--text-primary);
+            transform: scale(1.05);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .answer-labels {
+            display: flex;
+            justify-content: space-between;
+            color: #e2e8f0;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .quiz-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--text-accent);
+        }
+
+        /* Team Analysis Enhanced Styles */
+        .team-layout {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+            min-height: 600px;
+        }
+
+        .team-sidebar {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-xl);
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .team-main {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-xl);
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .member-item {
+            background: var(--bg-glass);
+            border-radius: var(--border-radius-md);
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .member-item:hover {
+            background: var(--bg-card);
+            transform: translateX(5px);
+            border-color: var(--border-accent);
+        }
+
+        /* Results Enhanced Styles */
+        .results-section {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-xl);
+            padding: 35px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .result-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--border-accent);
+        }
+
+        .mbti-type-card {
+            background: var(--primary-gradient);
+            color: var(--text-primary);
+            text-align: center;
+            padding: 40px;
+            border-radius: var(--border-radius-xl);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-accent);
+        }
+
+        .mbti-type {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .mbti-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .mbti-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dimension-bars {
+            display: grid;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .dimension-bar {
+            background: var(--bg-glass);
+            border-radius: var(--border-radius-md);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .dimension-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .bar-container {
+            position: relative;
+            height: 8px;
+            background: var(--bg-glass);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .percentage {
+            text-align: center;
+            margin-top: 8px;
+            color: var(--text-accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Element badge styles */
+        .element-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .element-metal {
+            background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+            color: #374151;
+        }
+
+        .element-water {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: #ffffff;
+        }
+
+        .element-fire {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+        }
+
+        .element-wood {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            color: #ffffff;
+        }
+
+        .element-earth {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 80px 40px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius-xl);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 6px solid var(--bg-glass);
+            border-top: 6px solid var(--text-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Reset Button */
+        .reset-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: none;
+            border: 1px solid var(--border-accent);
+        }
+
+        .reset-btn:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .team-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .team-sidebar {
+                position: static;
+                order: 2;
+            }
+
+            .team-main {
+                order: 1;
+            }
+
+            .selector-tabs {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-section {
+                grid-template-columns: 1fr;
+            }
+
+            .answer-options {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 5px;
+            }
+
+            .answer-option label {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+
+            .selector-tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .tab-btn {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .answer-options {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 3px;
+            }
+
+            .answer-option label {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Additional Enhancements */
+        .feature-highlight {
+            background: var(--dark-gradient);
+            color: var(--text-primary);
+            padding: 20px;
+            border-radius: var(--border-radius-lg);
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .info-tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .info-tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 1000;
+            border: 1px solid var(--border-color);
+        }
+
+        .animated-gradient {
+            background: linear-gradient(-45deg, #1e40af, #2563eb, #1d4ed8, #1e3a8a);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cosmic-particles"></div>
+    
+    <div class="container">
+        <div class="header animated-gradient">
+            <h1>🔮 Sistem Analisis Personaliti IASME</h1>
+            <p class="subtitle">Numerologi Metafizik & MBTI Personality Test - Temui Siapa Diri Anda Sebenarnya</p>
+        </div>
+
+        <div class="analysis-selector">
+            <div class="selector-tabs">
+                <button class="tab-btn active" onclick="switchTab(event, 'numerology')">
+                    🌟 Numerologi
+                </button>
+                <button class="tab-btn" onclick="switchTab(event, 'mbti')">
+                    🧠 MBTI Test
+                </button>
+                <button class="tab-btn" onclick="switchTab(event, 'team')">
+                    👥 Analisis Pasukan
+                </button>
+            </div>
+        </div>
+
+        <div class="form-section" id="numerologyForm">
+            <div class="section-title">
+                🌟 Analisis Numerologi Metafizik
+            </div>
+            <form id="metafizikForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fullName">👤 Nama Penuh</label>
+                        <input type="text" id="fullName" name="fullName" required placeholder="Masukkan nama penuh anda">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">📧 Alamat Emel</label>
+                        <input type="email" id="email" name="email" required placeholder="nama@contoh.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="birthDate">📅 Tarikh Lahir</label>
+                        <input type="date" id="birthDate" name="birthDate" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">✨ Analisis Numerologi Saya</button>
+            </form>
+        </div>
+
+        <div class="form-section" id="mbtiForm" style="display: none;">
+            <div class="section-title">
+                🧠 MBTI Personality Test
+            </div>
+            
+            <div class="quiz-header">
+                <h2>📋 Ujian Personaliti MBTI</h2>
+                <p>Jawab 20 soalan berikut untuk mengetahui jenis personaliti MBTI anda</p>
+            </div>
+
+            <form id="mbtiQuizForm">
+                <div class="form-grid" style="margin-bottom: 30px;">
+                    <div class="form-group">
+                        <label for="mbtiName">👤 Nama Penuh</label>
+                        <input type="text" id="mbtiName" required placeholder="Masukkan nama penuh anda">
+                    </div>
+                    <div class="form-group">
+                        <label for="mbtiEmail">📧 Alamat Emel</label>
+                        <input type="email" id="mbtiEmail" required placeholder="nama@contoh.com">
+                    </div>
+                </div>
+
+                <div class="quiz-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text">
+                        Soalan <span id="currentQuestion">1</span> daripada <span id="totalQuestions">20</span>
+                    </div>
+                </div>
+
+                <div id="questionsContainer"></div>
+
+                <div class="quiz-navigation">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" style="display: none;">⬅️ Sebelum</button>
+                    <button type="button" class="btn" id="nextBtn" onclick="nextQuestion()">Seterusnya ➡️</button>
+                    <button type="submit" class="btn" id="submitBtn" style="display: none;">🎯 Dapatkan Keputusan MBTI</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="team-layout" id="teamForm" style="display: none;">
+            <div class="team-sidebar">
+                <div class="sidebar-header">
+                    <h3>👥 Ahli Pasukan</h3>
+                    <div class="team-counter">
+                        <span>👤</span>
+                        <span id="memberCount">0</span>
+                        <span>Ahli</span>
+                    </div>
+                </div>
+
+                <div class="member-list" id="memberList">
+                    <div class="no-members-message">
+                        <p>Belum ada ahli pasukan ditambah.</p>
+                        <p>Klik butang di bawah untuk mula menambah ahli.</p>
+                    </div>
+                </div>
+
+                <button type="button" class="btn" onclick="addTeamMember()">
+                    ➕ Tambah Ahli Pasukan
+                </button>
+            </div>
+
+            <div class="team-main">
+                <div class="section-title">
+                    🏢 Analisis Pasukan Syarikat
+                </div>
+                
+                <form id="teamAnalysisForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="companyName">🏢 Nama Syarikat</label>
+                            <input type="text" id="companyName" name="companyName" required placeholder="Nama syarikat atau jabatan">
+                        </div>
+                        <div class="form-group">
+                            <label for="teamName">👥 Nama Pasukan</label>
+                            <input type="text" id="teamName" name="teamName" required placeholder="Contoh: Pasukan Pemasaran, IT Department">
+                        </div>
+                    </div>
+
+                    <div id="currentMemberForm" style="display: none;">
+                        <div class="form-section">
+                            <div class="section-title">
+                                👤 Maklumat Ahli <span id="currentMemberNumber">1</span>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>👤 Nama Penuh</label>
+                                    <input type="text" id="memberName" required placeholder="Nama ahli pasukan">
+                                </div>
+                                <div class="form-group">
+                                    <label>💼 Jawatan</label>
+                                    <input type="text" id="memberPosition" required placeholder="Contoh: Manager, Developer">
+                                </div>
+                                <div class="form-group">
+                                    <label>📅 Tarikh Lahir</label>
+                                    <input type="date" id="memberBirthDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>📧 Emel (Pilihan)</label>
+                                    <input type="email" id="memberEmail" placeholder="ahli@syarikat.com">
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                                <button type="button" class="btn" onclick="saveMember()">✅ Simpan Ahli</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelMemberEdit()">❌ Batal</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-highlight" id="analysisMessage">
+                        <h3>🔮 Sedia untuk Analisis</h3>
+                        <p>Tambah sekurang-kurangnya 2 ahli pasukan untuk memulakan analisis.</p>
+                    </div>
+
+                    <button type="submit" class="btn" id="analyzeBtn" disabled>
+                        🔮 Analisis Dinamik Pasukan
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="color: var(--text-accent); font-size: 1.3rem; font-weight: 600;">🌌 Menganalisis personaliti anda...</p>
+            <p style="color: var(--text-secondary); margin-top: 15px;">Sila tunggu sebentar...</p>
+        </div>
+
+        <div class="results-section" id="resultsSection"></div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn" onclick="resetAnalysis()">🔄</button>
+
+    <script>
+        // MBTI Questions Data
+        const mbtiQuestions = [
+            {
+                id: 1,
+                text: "Anda lebih suka menghabiskan masa dengan berkumpulan ramai?",
+                dimension: "EI",
+                extrovert: false
+            },
+            {
+                id: 2,
+                text: "Apabila membuat keputusan, anda lebih cenderung menggunakan logik?",
+                dimension: "TF",
+                thinking: false
+            },
+            {
+                id: 3,
+                text: "Anda lebih suka merancang aktiviti terlebih dahulu?",
+                dimension: "JP",
+                judging: false
+            },
+            {
+                id: 4,
+                text: "Anda lebih tertarik kepada fakta dan butiran?",
+                dimension: "SN",
+                sensing: false
+            },
+            {
+                id: 5,
+                text: "Anda cenderung untuk bermula dengan perbualan yang mendalam daripada perbualan ringan?",
+                dimension: "EI",
+                extrovert: false
+            },
+            {
+                id: 6,
+                text: "Anda lebih suka melihat gambaran besar daripada butiran kecil?",
+                dimension: "SN",
+                sensing: true
+            },
+            {
+                id: 7,
+                text: "Apabila berinteraksi dengan orang lain, anda lebih fokus kepada harmoni?",
+                dimension: "TF",
+                thinking: true
+            },
+            {
+                id: 8,
+                text: "Anda lebih suka mengekalkan pilihan anda terbuka?",
+                dimension: "JP",
+                judging: true
+            },
+            {
+                id: 9,
+                text: "Anda mendapat tenaga daripada bersendirian?",
+                dimension: "EI",
+                extrovert: true
+            },
+            {
+                id: 10,
+                text: "Anda membuat keputusan berdasarkan nilai-nilai peribadi?",
+                dimension: "TF",
+                thinking: true
+            },
+            {
+                id: 11,
+                text: "Anda lebih suka struktur dan jadual?",
+                dimension: "JP",
+                judging: false
+            },
+            {
+                id: 12,
+                text: "Anda lebih suka pengalaman praktikal daripada teori?",
+                dimension: "SN",
+                sensing: false
+            },
+            {
+                id: 13,
+                text: "Anda cenderung untuk bercakap sebelum berfikir?",
+                dimension: "EI",
+                extrovert: false
+            },
+            {
+                id: 14,
+                text: "Anda lebih fokus kepada kemungkinan masa depan daripada realiti semasa?",
+                dimension: "SN",
+                sensing: true
+            },
+            {
+                id: 15,
+                text: "Anda lebih suka bertegas daripada berkompromi?",
+                dimension: "TF",
+                thinking: false
+            },
+            {
+                id: 16,
+                text: "Anda selesa dengan situasi yang tidak dijangka?",
+                dimension: "JP",
+                judging: true
+            },
+            {
+                id: 17,
+                text: "Anda merasa letih selepas bersosial lama?",
+                dimension: "EI",
+                extrovert: true
+            },
+            {
+                id: 18,
+                text: "Anda lebih percaya kepada inspirasi daripada pengalaman?",
+                dimension: "SN",
+                sensing: true
+            },
+            {
+                id: 19,
+                text: "Anda lebih suka membantu orang lain secara emosi daripada menyelesaikan masalah secara logik?",
+                dimension: "TF",
+                thinking: true
+            },
+            {
+                id: 20,
+                text: "Anda cenderung untuk menunda membuat keputusan?",
+                dimension: "JP",
+                judging: true
+            }
+        ];
+
+        // Numerology Data (simplified for example)
+        const personalityData = {
+            1: { 
+                title: "KETULENAN", 
+                element: "METAL", 
+                elementClass: "element-metal",
+                pro: "Berkemampuan untuk menjadi pemimpin dan suka menyendiri. Berani membuat keputusan dan seorang yang cekal. Mampu membuat banyak kerja dalam satu masa.",
+                contra: "Suka memaksa, tiada tolak ansur, dan suka memendam rasa. Degil, tidak sabar dan emosi tidak stabil.",
+                suggestion: "Berikan peluang kepada orang lain, belajar menerima kegagalan dan cuba melatih diri untuk lebih bersabar.",
+                compatibility: [3, 5, 7],
+                luckyColors: ["Putih", "Kuning", "Emas"],
+                luckyNumbers: [1, 10, 19, 28],
+                luckyDays: ["Ahad", "Isnin"],
+                career: "Pemimpin, Pengurus, Usahawan, Jurutera",
+                fortune: { love: 75, career: 90, health: 80, wealth: 85 }
+            },
+            2: { 
+                title: "KESEIMBANGAN", 
+                element: "WATER", 
+                elementClass: "element-water",
+                pro: "Seorang yang bersifat sabar, tenang, pemurah dan tidak suka bergaduh. Suka tolong orang, berfikiran positif dan seorang yang setia. Paling penting, seorang yang ideal.",
+                contra: "Kadang-kadang bersikap kedekut, emosi dan mudah merajuk. Mudah terpengaruh dengan pujukan dan berfikiran negatif.",
+                suggestion: "Belajar mengawal emosi, berfikiran positif dan jangan mudah terpengaruh dengan orang lain.",
+                compatibility: [2, 4, 6, 8],
+                luckyColors: ["Biru", "Hijau", "Putih"],
+                luckyNumbers: [2, 11, 20, 29],
+                luckyDays: ["Isnin", "Jumaat"],
+                career: "Diplomat, Kaunselor, Pekerja Sosial, Guru",
+                fortune: { love: 90, career: 70, health: 85, wealth: 75 }
+            },
+            3: { 
+                title: "KETELITIAN", 
+                element: "FIRE", 
+                elementClass: "element-fire",
+                pro: "Dikatakan sebagai seorang individu yang serba boleh. Seorang yang idealistik, aktif dan berpandangan jauh. Tahu dan faham keperluan diri. Mampu membezakan antara perkara buruk dengan perkara baik. Berkebolehan dalam bidang yang diceburi.",
+                contra: "Bersikap terlalu agresif, bukan seorang yang penyabar dan boleh jadi seorang yang emosi.",
+                suggestion: "Belajar untuk bertenang, kurangkan sifat agresif dan bersabar dalam setiap tindakan.",
+                compatibility: [1, 5, 9],
+                luckyColors: ["Merah", "Ungu", "Jingga"],
+                luckyNumbers: [3, 12, 21, 30],
+                luckyDays: ["Selasa", "Khamis"],
+                career: "Artis, Pemasar, Jurucakap, Pengusaha",
+                fortune: { love: 80, career: 85, health: 70, wealth: 80 }
+            },
+            4: { 
+                title: "KEJURUSAN", 
+                element: "WOOD", 
+                elementClass: "element-wood",
+                pro: "Seorang yang bertanggungjawab dan sentiasa fokus dengan apa yang dilakukan. Berdikari, berani dan jujur dalam setiap tindakan.",
+                contra: "Seorang yang tidak boleh menerima arahan, suka melawan dan kadangkala bersikap keras kepala. Mudah menyalahkan orang lain.",
+                suggestion: "Belajar untuk mendengar pendapat orang lain, jangan mudah menyalahkan dan cuba bersifat fleksibel.",
+                compatibility: [2, 6, 8],
+                luckyColors: ["Hijau", "Coklat", "Biru"],
+                luckyNumbers: [4, 13, 22, 31],
+                luckyDays: ["Rabu", "Ahad"],
+                career: "Akauntan, Arkitek, Pentadbir, Penganalisis",
+                fortune: { love: 70, career: 90, health: 75, wealth: 80 }
+            },
+            5: { 
+                title: "KEMANUSIAAN", 
+                element: "EARTH", 
+                elementClass: "element-earth",
+                pro: "Seorang yang tidak suka terikat dengan jadual. Suka kebebasan dan mencuba perkara baru. Kreatif, mudah bergaul dan seorang yang bijak dalam komunikasi.",
+                contra: "Sukar untuk fokus, tidak suka bekerja secara berkumpulan dan kadang-kadang bersikap ego.",
+                suggestion: "Belajar untuk fokus, cuba bekerja secara berkumpulan dan kurangkan sifat ego.",
+                compatibility: [1, 3, 7],
+                luckyColors: ["Kuning", "Coklat", "Jingga"],
+                luckyNumbers: [5, 14, 23],
+                luckyDays: ["Rabu", "Jumaat"],
+                career: "Pemasar, Penulis, Jurujual, Pengembara",
+                fortune: { love: 85, career: 75, health: 80, wealth: 70 }
+            },
+            6: { 
+                title: "KEHARMONIAN", 
+                element: "WATER", 
+                elementClass: "element-water",
+                pro: "Seorang yang penyayang, suka menolong dan seorang yang bertanggungjawab. Sentiasa mendahulukan keluarga dan sahabat. Mampu menyelesaikan masalah dengan baik.",
+                contra: "Mudah terasa, suka merajuk dan kadang-kadang bersikap mementingkan diri sendiri.",
+                suggestion: "Belajar untuk tidak mudah terasa, jangan mudah merajuk dan cuba untuk berfikir secara terbuka.",
+                compatibility: [2, 4, 8],
+                luckyColors: ["Biru", "Hijau", "Merah Jambu"],
+                luckyNumbers: [6, 15, 24],
+                luckyDays: ["Khamis", "Sabtu"],
+                career: "Kaunselor, Doktor, Jururawat, Pendidik",
+                fortune: { love: 95, career: 80, health: 90, wealth: 75 }
+            },
+            7: { 
+                title: "KEROHANIAN", 
+                element: "METAL", 
+                elementClass: "element-metal",
+                pro: "Seorang yang bijak, mempunyai pemikiran yang mendalam dan sukakan ilmu. Suka belajar dan sentiasa mencari kebenaran. Seorang yang berfikiran rasional.",
+                contra: "Suka bersendirian, kurang bersosial dan kadang-kadang bersikap misteri.",
+                suggestion: "Belajar untuk lebih bersosial, jangan suka menyendiri dan cuba untuk lebih terbuka.",
+                compatibility: [1, 5, 9],
+                luckyColors: ["Ungu", "Putih", "Kelabu"],
+                luckyNumbers: [7, 16, 25],
+                luckyDays: ["Ahad", "Selasa"],
+                career: "Penyelidik, Saintis, Ahli Falsafah, Penulis",
+                fortune: { love: 60, career: 95, health: 70, wealth: 80 }
+            },
+            8: { 
+                title: "KEKUATAN", 
+                element: "EARTH", 
+                elementClass: "element-earth",
+                pro: "Seorang yang kuat bekerja, berdisiplin dan sentiasa fokus dengan matlamat. Mampu mencapai kejayaan dalam bidang yang diceburi.",
+                contra: "Suka mengarah, tidak sabar dan kadang-kadang bersikap sombong.",
+                suggestion: "Belajar untuk bersabar, jangan suka mengarah dan cuba untuk lebih merendah diri.",
+                compatibility: [2, 4, 6],
+                luckyColors: ["Emas", "Coklat", "Hitam"],
+                luckyNumbers: [8, 17, 26],
+                luckyDays: ["Sabtu", "Isnin"],
+                career: "Usahawan, Pengurus, Peguam, Akauntan",
+                fortune: { love: 70, career: 90, health: 80, wealth: 95 }
+            },
+            9: { 
+                title: "KEBIJAKSANAAN", 
+                element: "FIRE", 
+                elementClass: "element-fire",
+                pro: "Seorang yang pemaaf, suka menolong dan seorang yang penyayang. Mampu memahami perasaan orang lain dan seorang yang berwawasan.",
+                contra: "Mudah cemburu, suka membandingkan dan kadang-kadang bersikap tidak puas hati.",
+                suggestion: "Belajar untuk tidak mudah cemburu, jangan suka membandingkan dan cuba untuk lebih bersyukur.",
+                compatibility: [3, 7],
+                luckyColors: ["Merah", "Putih", "Emas"],
+                luckyNumbers: [9, 18, 27],
+                luckyDays: ["Jumaat", "Rabu"],
+                career: "Pendidik, Kaunselor, Pekerja Sosial, Doktor",
+                fortune: { love: 85, career: 80, health: 85, wealth: 70 }
+            }
+        };
+
+        const mbtiTypes = {
+            "ISTJ": {
+                name: "The Inspector",
+                description: "Praktikal dan berorientasikan fakta. Bertanggungjawab dan setia.",
+                strengths: ["Bertanggungjawab", "Berorientasikan fakta", "Teratur", "Setia"],
+                weaknesses: ["Keras kepala", "Tidak fleksibel", "Sukar menerima perubahan"]
+            },
+            "ISFJ": {
+                name: "The Defender",
+                description: "Hangat hati, bertanggungjawab, dan melindungi. Setia dan teliti.",
+                strengths: ["Penyayang", "Teliti", "Setia", "Sabar"],
+                weaknesses: ["Sensitif", "Mengelak konflik", "Sukar mengatakan 'tidak'"]
+            },
+            "INFJ": {
+                name: "The Advocate",
+                description: "Pendiam tetapi memberi inspirasi. Berwawasan dan idealistik.",
+                strengths: ["Berwawasan", "Empati", "Kreatif", "Berinspirasi"],
+                weaknesses: ["Terlalu idealistik", "Sukar membuka diri", "Mudah terbakar"]
+            },
+            "INTJ": {
+                name: "The Architect",
+                description: "Pemikir strategik yang inovatif dan logik. Mampu melihat gambaran besar.",
+                strengths: ["Strategik", "Logik", "Inovatif", "Bebas"],
+                weaknesses: ["Sombong", "Tidak sabar dengan ketidakcekapan", "Terlalu kritikal"]
+            },
+            "ISTP": {
+                name: "The Virtuoso",
+                description: "Fleksibel dan pragmatik. Suka meneroka dan belajar melalui pengalaman.",
+                strengths: ["Praktikal", "Fleksibel", "Analitikal", "Tenang"],
+                weaknesses: ["Tidak peka", "Sukar komitmen", "Cenderung mengambil risiko"]
+            },
+            "ISFP": {
+                name: "The Adventurer",
+                description: "Artistik dan sensitif. Menghargai kebebasan dan pengalaman.",
+                strengths: ["Artistik", "Sensitif", "Fleksibel", "Suka membantu"],
+                weaknesses: ["Sukar merancang", "Terlalu sederhana", "Mudah terpengaruh"]
+            },
+            "INFP": {
+                name: "The Mediator",
+                description: "Idealistik, ingin tahu, dan setia kepada nilai-nilai mereka.",
+                strengths: ["Idealistik", "Empati", "Kreatif", "Terbuka minda"],
+                weaknesses: ["Terlalu sensitif", "Sukar membuat keputusan", "Cenderung menarik diri"]
+            },
+            "INTP": {
+                name: "The Logician",
+                description: "Cerewet, inovatif, dan pemikir yang objektif.",
+                strengths: ["Logik", "Inovatif", "Analitikal", "Bebas"],
+                weaknesses: ["Tidak peka sosial", "Sukar berkompromi", "Cenderung mengkritik"]
+            },
+            "ESTP": {
+                name: "The Entrepreneur",
+                description: "Bertenaga, suka bergaul, dan berorientasikan tindakan.",
+                strengths: ["Berani", "Praktikal", "Fleksibel", "Suka bersosial"],
+                weaknesses: ["Impulsif", "Sukar merancang", "Tidak peka"]
+            },
+            "ESFP": {
+                name: "The Entertainer",
+                description: "Suka bergaul, spontan, dan suka menjadi pusat perhatian.",
+                strengths: ["Suka bersosial", "Spontan", "Optimis", "Penyayang"],
+                weaknesses: ["Sukar merancang", "Mudah bosan", "Terlalu bergantung pada orang lain"]
+            },
+            "ENFP": {
+                name: "The Campaigner",
+                description: "Kreatif, bersemangat, dan berorientasikan orang.",
+                strengths: ["Kreatif", "Bersemangat", "Suka bersosial", "Fleksibel"],
+                weaknesses: ["Sukar fokus", "Terlalu emosional", "Mudah terganggu"]
+            },
+            "ENTP": {
+                name: "The Debater",
+                description: "Cerdas, ingin tahu, dan suka mencabar status quo.",
+                strengths: ["Cerdas", "Inovatif", "Analitikal", "Berani"],
+                weaknesses: ["Sukar fokus", "Tidak sabar", "Terlalu mengkritik"]
+            },
+            "ESTJ": {
+                name: "The Executive",
+                description: "Praktikal, teratur, dan berorientasikan peraturan.",
+                strengths: ["Praktikal", "Teratur", "Bertanggungjawab", "Berani"],
+                weaknesses: ["Keras kepala", "Tidak fleksibel", "Terlalu mengawal"]
+            },
+            "ESFJ": {
+                name: "The Consul",
+                description: "Suka bergaul, penyayang, dan teratur. Suka membantu orang lain.",
+                strengths: ["Penyayang", "Suka bersosial", "Teratur", "Bertanggungjawab"],
+                weaknesses: ["Terlalu sensitif", "Sukar menerima kritikan", "Cenderung mengawal"]
+            },
+            "ENFJ": {
+                name: "The Protagonist",
+                description: "Karismatik, memberi inspirasi, dan fokus pada orang lain.",
+                strengths: ["Karismatik", "Memberi inspirasi", "Empati", "Penyayang"],
+                weaknesses: ["Terlalu idealistik", "Sukar mengatakan 'tidak'", "Mudah terbakar"]
+            },
+            "ENTJ": {
+                name: "The Commander",
+                description: "Pemimpin yang kuat, strategik, dan berorientasikan matlamat.",
+                strengths: ["Pemimpin", "Strategik", "Logik", "Berani"],
+                weaknesses: ["Sombong", "Tidak sabar", "Terlalu mengawal"]
+            }
+        };
+
+        // Global variables for MBTI Quiz
+        let currentQuestionIndex = 0;
+        let mbtiAnswers = {};
+        let currentAnalysisType = 'numerology'; // Default tab
+
+        // Global variables for Team Analysis
+        let teamMembers = [];
+        let isEditingMember = false;
+        let editingMemberIndex = -1;
+        let currentResultsData = null; // To store data for PDF export
+
+        // Make functions globally accessible
+        window.switchTab = switchTab;
+        window.nextQuestion = nextQuestion;
+        window.previousQuestion = previousQuestion;
+        window.addTeamMember = addTeamMember;
+        window.editMember = editMember;
+        window.removeMember = removeMember;
+        window.saveMember = saveMember;
+        window.cancelMemberEdit = cancelMemberEdit;
+        window.resetAnalysis = resetAnalysis;
+        window.exportToPDF = exportToPDF;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing app...');
+            try {
+                createCosmicParticles();
+                initializeMBTIQuiz();
+                updateMemberList();
+                // Ensure the initial tab is shown
+                const numerologyForm = document.getElementById('numerologyForm');
+                if (numerologyForm) {
+                    numerologyForm.style.display = 'block';
+                }
+                console.log('App initialized successfully');
+            } catch (error) {
+                console.error('Error initializing app:', error);
+            }
+        });
+
+        function createCosmicParticles() {
+            const particlesContainer = document.querySelector('.cosmic-particles');
+            const numberOfParticles = 30; // Reduced from 50 for more professional look
+            for (let i = 0; i < numberOfParticles; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's'; // Slower animation
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function switchTab(event, type) {
+            try {
+                currentAnalysisType = type;
+
+                // Update tab buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                }
+
+                // Hide all forms
+                const numerologyForm = document.getElementById('numerologyForm');
+                const mbtiForm = document.getElementById('mbtiForm');
+                const teamForm = document.getElementById('teamForm');
+
+                if (numerologyForm) numerologyForm.style.display = 'none';
+                if (mbtiForm) mbtiForm.style.display = 'none';
+                if (teamForm) teamForm.style.display = 'none';
+
+                // Show selected form
+                if (type === 'numerology' && numerologyForm) {
+                    numerologyForm.style.display = 'block';
+                } else if (type === 'mbti' && mbtiForm) {
+                    mbtiForm.style.display = 'block';
+                    initializeMBTIQuiz(); // Re-initialize MBTI quiz when tab is switched
+                } else if (type === 'team' && teamForm) {
+                    teamForm.style.display = 'grid';
+                    updateMemberList(); // Ensure team list is updated
+                }
+
+                // Hide results and reset button when switching tabs
+                document.getElementById('resultsSection').style.display = 'none';
+                document.getElementById('resetBtn').style.display = 'none';
+
+                // Scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            } catch (error) {
+                console.error('Error switching tab:', error);
+            }
+        }
+
+        // Numerology Form Submission
+        document.getElementById('metafizikForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const birthDate = document.getElementById('birthDate').value;
+
+            if (!fullName || !email || !birthDate) {
+                alert('Sila lengkapkan semua maklumat yang diperlukan.');
+                return;
+            }
+
+            showLoading('numerology');
+
+            // Simulate API call or complex calculation delay
+            setTimeout(() => {
+                calculateNumerology(birthDate, fullName);
+                hideLoading();
+            }, 3000);
+        });
+
+        // MBTI Quiz Functions
+        function initializeMBTIQuiz() {
+            currentQuestionIndex = 0;
+            mbtiAnswers = {};
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const questionsContainer = document.getElementById('questionsContainer');
+            if (!questionsContainer) {
+                console.error('questionsContainer not found');
+                return;
+            }
+            const question = mbtiQuestions[currentQuestionIndex];
+            if (!question) {
+                console.error('Question not found for index:', currentQuestionIndex);
+                return;
+            }
+
+            questionsContainer.innerHTML = `
+                <div class="question-card">
+                    <div class="question-number">Soalan ${question.id}</div>
+                    <div class="question-text">${question.text}</div>
+                    <div class="answer-options">
+                        <div class="answer-option">
+                            <input type="radio" id="q${question.id}_1" name="q${question.id}" value="1">
+                            <label for="q${question.id}_1">1</label>
+                        </div>
+                        <div class="answer-option">
+                            <input type="radio" id="q${question.id}_2" name="q${question.id}" value="2">
+                            <label for="q${question.id}_2">2</label>
+                        </div>
+                        <div class="answer-option">
+                            <input type="radio" id="q${question.id}_3" name="q${question.id}" value="3">
+                            <label for="q${question.id}_3">3</label>
+                        </div>
+                        <div class="answer-option">
+                            <input type="radio" id="q${question.id}_4" name="q${question.id}" value="4">
+                            <label for="q${question.id}_4">4</label>
+                        </div>
+                        <div class="answer-option">
+                            <input type="radio" id="q${question.id}_5" name="q${question.id}" value="5">
+                            <label for="q${question.id}_5">5</label>
+                        </div>
+                    </div>
+                    <div class="answer-labels">
+                        <span>Sangat Tidak Setuju</span>
+                        <span>Sangat Setuju</span>
+                    </div>
+                </div>
+            `;
+
+            // Restore previous answer if exists
+            if (mbtiAnswers[question.id]) {
+                const radio = document.querySelector(`input[name="q${question.id}"][value="${mbtiAnswers[question.id]}"]`);
+                if (radio) radio.checked = true;
+            }
+
+            // Update progress
+            updateProgress();
+            updateNavigation();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / mbtiQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            prevBtn.style.display = currentQuestionIndex > 0 ? 'block' : 'none';
+
+            if (currentQuestionIndex === mbtiQuestions.length - 1) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        function nextQuestion() {
+            try {
+                const currentQuestion = mbtiQuestions[currentQuestionIndex];
+                const selectedAnswer = document.querySelector(`input[name="q${currentQuestion.id}"]:checked`);
+
+                if (!selectedAnswer) {
+                    alert('Sila pilih jawapan sebelum meneruskan.');
+                    return;
+                }
+
+                mbtiAnswers[currentQuestion.id] = parseInt(selectedAnswer.value);
+
+                if (currentQuestionIndex < mbtiQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                } else {
+                    // This case should ideally be handled by submitBtn
+                    console.log('End of questions, waiting for submit.');
+                }
+            } catch (error) {
+                console.error('Error in nextQuestion:', error);
+            }
+        }
+
+        function previousQuestion() {
+            try {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    displayQuestion();
+                }
+            } catch (error) {
+                console.error('Error in previousQuestion:', error);
+            }
+        }
+
+        document.getElementById('mbtiQuizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const mbtiName = document.getElementById('mbtiName').value;
+            const mbtiEmail = document.getElementById('mbtiEmail').value;
+
+            if (!mbtiName || !mbtiEmail) {
+                alert('Sila lengkapkan nama dan emel anda.');
+                return;
+            }
+
+            const currentQuestion = mbtiQuestions[currentQuestionIndex];
+            const selectedAnswer = document.querySelector(`input[name="q${currentQuestion.id}"]:checked`);
+
+            if (!selectedAnswer) {
+                alert('Sila pilih jawapan untuk soalan terakhir.');
+                return;
+            }
+            mbtiAnswers[currentQuestion.id] = parseInt(selectedAnswer.value);
+
+            showLoading('mbti');
+
+            setTimeout(() => {
+                calculateMBTI(mbtiName, mbtiEmail);
+                hideLoading();
+            }, 3000);
+        });
+
+        // Loading Screen
+        const loadingTexts = {
+            numerology: "🌌 Menganalisis nombor takdir anda...",
+            mbti: "🧠 Menentukan jenis personaliti MBTI anda...",
+            team: "📊 Menganalisis dinamik pasukan anda..."
+        };
+
+        function showLoading(type) {
+            const loadingElement = document.getElementById('loading');
+            const loadingText = loadingElement.querySelector('p:first-of-type');
+            loadingText.textContent = loadingTexts[type] || loadingTexts.numerology;
+            loadingText.style.color = 'var(--text-accent)';
+            loadingElement.style.display = 'block';
+
+            if (type === 'numerology') {
+                document.getElementById('numerologyForm').style.display = 'none';
+            } else if (type === 'mbti') {
+                document.getElementById('mbtiForm').style.display = 'none';
+            } else if (type === 'team') {
+                document.getElementById('teamForm').style.display = 'none';
+            }
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'block';
+        }
+
+        function calculateNumerology(birthDate, fullName) {
+            const date = new Date(birthDate);
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+
+            const dayDigits = day.toString().split('').map(Number);
+            const monthDigits = month.toString().split('').map(Number);
+            const yearDigits = year.toString().split('').map(Number);
+
+            let daySum = dayDigits.reduce((a, b) => a + b, 0);
+            if (daySum >= 10) daySum = Math.floor(daySum / 10) + (daySum % 10);
+
+            let monthSum = monthDigits.reduce((a, b) => a + b, 0);
+            if (monthSum >= 10) monthSum = Math.floor(monthSum / 10) + (monthSum % 10);
+
+            let yearSum = yearDigits.reduce((a, b) => a + b, 0);
+            while (yearSum >= 10) {
+                yearSum = Math.floor(yearSum / 10) + (yearSum % 10);
+            }
+
+            let totalSum = daySum + monthSum + yearSum;
+            while (totalSum >= 10) {
+                totalSum = Math.floor(totalSum / 10) + (totalSum % 10);
+            }
+            const mainCode = totalSum;
+            displayNumerologyResults(mainCode, fullName, formattedDate);
+        }
+
+        function calculateMBTI(name, email) {
+            const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+
+            mbtiQuestions.forEach(question => {
+                const answer = mbtiAnswers[question.id];
+                // Scale 1-5, convert to -2 to +2
+                const value = answer - 3; 
+
+                if (question.dimension === "EI") {
+                    if (question.extrovert) scores.I += value; else scores.E += value;
+                } else if (question.dimension === "SN") {
+                    if (question.sensing) scores.N += value; else scores.S += value;
+                } else if (question.dimension === "TF") {
+                    if (question.thinking) scores.F += value; else scores.T += value;
+                } else if (question.dimension === "JP") {
+                    if (question.judging) scores.P += value; else scores.J += value;
+                }
+            });
+
+            // Determine MBTI type
+            const type = (scores.E > scores.I ? 'E' : 'I') +
+                         (scores.S > scores.N ? 'S' : 'N') +
+                         (scores.T > scores.F ? 'T' : 'F') +
+                         (scores.J > scores.P ? 'J' : 'P');
+            
+            // Calculate percentages (example simple calculation for visualization)
+            const percentages = {
+                EI: Math.round((Math.abs(scores.E - scores.I) / (Math.abs(scores.E) + Math.abs(scores.I) + 20)) * 100),
+                SN: Math.round((Math.abs(scores.S - scores.N) / (Math.abs(scores.S) + Math.abs(scores.N) + 20)) * 100),
+                TF: Math.round((Math.abs(scores.T - scores.F) / (Math.abs(scores.T) + Math.abs(scores.F) + 20)) * 100),
+                JP: Math.round((Math.abs(scores.J - scores.P) / (Math.abs(scores.J) + Math.abs(scores.P) + 20)) * 100)
+            };
+
+
+            displayMBTIResults(type, name, email, scores, percentages);
+        }
+
+        function displayNumerologyResults(mainCode, fullName, formattedDate) {
+            const personality = personalityData[mainCode];
+
+            // Store results data for PDF export
+            currentResultsData = { type: 'numerology', data: { mainCode, fullName, formattedDate, personality } };
+
+            const resultsHTML = `
+                <div class="result-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: var(--text-accent); margin: 0;">
+                            🌟 Keputusan Numerologi - ${fullName}
+                        </h3>
+                        <button onclick="exportToPDF()" class="export-btn">📄 Export PDF</button>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <div style="font-size: 1.5rem; color: var(--text-secondary); margin-bottom: 10px;">📅 ${formattedDate}</div>
+                        <div style="font-size: 3rem; font-weight: 800; color: var(--text-accent); margin-bottom: 10px;">${mainCode}</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-primary);">${personality.title}</div>
+                        <div style="margin-top: 15px;">
+                            <span class="element-badge ${personality.elementClass}">${personality.element}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 30px;">
+                        <h4 style="color: var(--text-accent); margin-bottom: 15px;">✨ Kelebihan Utama</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">${personality.pro}</p>
+                        <h4 style="color: var(--text-accent); margin-bottom: 15px;">⚠️ Kelemahan Yang Perlu Diperbaiki</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">${personality.contra}</p>
+                        <h4 style="color: var(--text-accent); margin-bottom: 15px;">💡 Cadangan Pembaikan</h4>
+                        <p style="color: var(--text-secondary); line-height: 1.6;">${personality.suggestion}</p>
+                    </div>
+
+                    <div style="margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                        <div style="text-align: center; padding: 15px; background: var(--bg-glass); border-radius: var(--border-radius-md);">
+                            <h5 style="color: var(--text-accent); margin-bottom: 8px;">💖 Keserasian</h5>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">${personality.compatibility.join(', ')}</p>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: var(--bg-glass); border-radius: var(--border-radius-md);">
+                            <h5 style="color: var(--text-accent); margin-bottom: 8px;">🔢 Nombor Bertuah</h5>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">${personality.luckyNumbers.join(', ')}</p>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: var(--bg-glass); border-radius: var(--border-radius-md);">
+                            <h5 style="color: var(--text-accent); margin-bottom: 8px;">🎨 Warna Bertuah</h5>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">${personality.luckyColors.join(', ')}</p>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: var(--bg-glass); border-radius: var(--border-radius-md);">
+                            <h5 style="color: var(--text-accent); margin-bottom: 8px;">🗓️ Hari Bertuah</h5>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">${personality.luckyDays.join(', ')}</p>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: var(--bg-glass); border-radius: var(--border-radius-md);">
+                            <h5 style="color: var(--text-accent); margin-bottom: 8px;">💼 Kerjaya Sesuai</h5>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">${personality.career}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('resultsSection').innerHTML = resultsHTML;
+            document.getElementById('resultsSection').style.display = 'grid';
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function displayMBTIResults(type, name, email, scores, percentages) {
+            const mbtiData = mbtiTypes[type];
+
+            // Store results data for PDF export
+            currentResultsData = { type: 'mbti', data: { type, name, email, scores, percentages, mbtiData } };
+
+            const resultsHTML = `
+                <div class="mbti-type-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div style="flex-grow: 1;">
+                            <div class="mbti-type">${type}</div>
+                            <div class="mbti-name">${mbtiData.name}</div>
+                            <div class="mbti-description">${mbtiData.description}</div>
+                        </div>
+                        <button onclick="exportToPDF()" class="export-btn" style="margin-top: -20px;">📄 Export PDF</button>
+                    </div>
+                </div>
+                <div class="result-card">
+                    <h3 style="color: var(--text-accent); margin-bottom: 25px;">🎯 Profil Personaliti ${name}</h3>
+                    <div class="dimension-bars">
+                        <div class="dimension-bar">
+                            <div class="dimension-labels">
+                                <span>${scores.E > scores.I ? 'Extrovert (E)' : 'Introvert (I)'}</span>
+                                <span>${percentages.EI}%</span>
+                            </div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: ${percentages.EI}%"></div>
+                            </div>
+                        </div>
+                        <div class="dimension-bar">
+                            <div class="dimension-labels">
+                                <span>${scores.S > scores.N ? 'Sensing (S)' : 'Intuition (N)'}</span>
+                                <span>${percentages.SN}%</span>
+                            </div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: ${percentages.SN}%"></div>
+                            </div>
+                        </div>
+                        <div class="dimension-bar">
+                            <div class="dimension-labels">
+                                <span>${scores.T > scores.F ? 'Thinking (T)' : 'Feeling (F)'}</span>
+                                <span>${percentages.TF}%</span>
+                            </div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: ${percentages.TF}%"></div>
+                            </div>
+                        </div>
+                        <div class="dimension-bar">
+                            <div class="dimension-labels">
+                                <span>${scores.J > scores.P ? 'Judging (J)' : 'Perceiving (P)'}</span>
+                                <span>${percentages.JP}%</span>
+                            </div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: ${percentages.JP}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 30px;">
+                        <h4 style="color: var(--text-accent); margin-bottom: 15px;">✅ Kekuatan Utama</h4>
+                        <ul style="color: var(--text-secondary); list-style-type: disc; padding-left: 20px; line-height: 1.6;">
+                            ${mbtiData.strengths.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                        <h4 style="color: var(--text-accent); margin-top: 30px; margin-bottom: 15px;">🚧 Area Pembaikan</h4>
+                        <ul style="color: var(--text-secondary); list-style-type: disc; padding-left: 20px; line-height: 1.6;">
+                            ${mbtiData.weaknesses.map(w => `<li>${w}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            document.getElementById('resultsSection').innerHTML = resultsHTML;
+            document.getElementById('resultsSection').style.display = 'grid';
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Team Analysis Functions
+        function updateMemberList() {
+            try {
+                const memberList = document.getElementById('memberList');
+                const memberCount = document.getElementById('memberCount');
+                const analyzeBtn = document.getElementById('analyzeBtn');
+                const analysisMessage = document.getElementById('analysisMessage');
+
+                if (!memberList || !memberCount || !analyzeBtn || !analysisMessage) {
+                    console.warn('Some team analysis elements not found');
+                    return;
+                }
+
+                memberCount.textContent = teamMembers.length;
+
+                if (teamMembers.length === 0) {
+                    memberList.innerHTML = `
+                        <div class="no-members-message" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                            <p>Belum ada ahli pasukan ditambah.</p>
+                            <p>Klik butang di bawah untuk mula menambah ahli.</p>
+                        </div>
+                    `;
+                    analyzeBtn.disabled = true;
+                    analysisMessage.innerHTML = `
+                        <h3>🔮 Sedia untuk Analisis</h3>
+                        <p>Tambah sekurang-kurangnya 2 ahli pasukan untuk memulakan analisis.</p>
+                    `;
+                } else {
+                    let memberListHTML = '';
+                    let validMembers = 0;
+                    teamMembers.forEach((member, index) => {
+                        const isComplete = member.name && member.position && member.birthDate;
+                        if (isComplete) validMembers++;
+                        const statusIcon = isComplete ? '✅' : '⚠️';
+                        const statusColor = isComplete ? '#10b981' : '#d97706';
+
+                        memberListHTML += `
+                            <div class="member-item" onclick="editMember(${index})" style="border-left: 3px solid ${statusColor};">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <div style="background: var(--primary-gradient); color: var(--text-primary); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">${index + 1}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px;">
+                                        ${statusIcon} ${isComplete ? 'Lengkap' : 'Belum Lengkap'}
+                                    </div>
+                                </div>
+                                <h4 style="color: var(--text-primary); margin-bottom: 5px;">${member.name || 'Nama Tiada'}</h4>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem;">${member.position || 'Jawatan Tiada'}</p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">${member.birthDate || 'Tarikh Lahir Tiada'}</span>
+                                    <button type="button" class="btn" style="padding: 5px 10px; font-size: 0.8rem; width: auto; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);" onclick="event.stopPropagation(); removeMember(${index})">🗑️ Buang</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    memberList.innerHTML = memberListHTML;
+
+                    if (validMembers >= 2) {
+                        analyzeBtn.disabled = false;
+                        analysisMessage.innerHTML = `
+                            <h3>✨ Sedia untuk Analisis Pasukan</h3>
+                            <p>Klik 'Analisis Dinamik Pasukan' untuk mendapatkan keputusan.</p>
+                        `;
+                    } else {
+                        analyzeBtn.disabled = true;
+                        analysisMessage.innerHTML = `
+                            <h3>🔮 Sedia untuk Analisis</h3>
+                            <p>Tambah sekurang-kurangnya 2 ahli pasukan dengan maklumat lengkap untuk memulakan analisis.</p>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating member list:', error);
+            }
+        }
+
+        function addTeamMember() {
+            if (isEditingMember) {
+                alert('Sila simpan atau batalkan pengeditan ahli semasa terlebih dahulu.');
+                return;
+            }
+            // Clear form fields
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberPosition').value = '';
+            document.getElementById('memberBirthDate').value = '';
+            document.getElementById('memberEmail').value = '';
+
+            // Show form
+            document.getElementById('currentMemberForm').style.display = 'block';
+            document.getElementById('currentMemberNumber').textContent = teamMembers.length + 1;
+
+            // Scroll to form
+            document.getElementById('currentMemberForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function editMember(index) {
+            if (isEditingMember) {
+                alert('Sila selesaikan pengeditan ahli semasa terlebih dahulu.');
+                return;
+            }
+            isEditingMember = true;
+            editingMemberIndex = index;
+            const member = teamMembers[index];
+
+            // Fill form with member data
+            document.getElementById('memberName').value = member.name || '';
+            document.getElementById('memberPosition').value = member.position || '';
+            document.getElementById('memberBirthDate').value = member.birthDate || '';
+            document.getElementById('memberEmail').value = member.email || '';
+
+            // Show form
+            document.getElementById('currentMemberForm').style.display = 'block';
+            document.getElementById('currentMemberNumber').textContent = index + 1;
+
+            // Scroll to form
+            document.getElementById('currentMemberForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function saveMember() {
+            const name = document.getElementById('memberName').value.trim();
+            const position = document.getElementById('memberPosition').value.trim();
+            const birthDate = document.getElementById('memberBirthDate').value;
+            const email = document.getElementById('memberEmail').value.trim();
+
+            if (!name || !position || !birthDate) {
+                alert('Sila lengkapkan nama, jawatan, dan tarikh lahir.');
+                return;
+            }
+
+            const memberData = {
+                name: name,
+                position: position,
+                birthDate: birthDate,
+                email: email,
+                numerologyCode: calculateNumerologyCode(birthDate)
+            };
+
+            if (editingMemberIndex === -1) {
+                // Adding new member
+                teamMembers.push(memberData);
+            } else {
+                // Editing existing member
+                teamMembers[editingMemberIndex] = memberData;
+            }
+
+            // Reset form state
+            isEditingMember = false;
+            editingMemberIndex = -1;
+            document.getElementById('currentMemberForm').style.display = 'none';
+
+            // Update display
+            updateMemberList();
+        }
+
+        function removeMember(index) {
+            if (confirm(`Adakah anda pasti ingin membuang ${teamMembers[index].name || 'ahli ini'} dari pasukan?`)) {
+                teamMembers.splice(index, 1);
+                updateMemberList();
+            }
+        }
+
+        function cancelMemberEdit() {
+            // Reset form state
+            isEditingMember = false;
+            editingMemberIndex = -1;
+            document.getElementById('currentMemberForm').style.display = 'none';
+
+            // Clear form fields
+            document.getElementById('memberName').value = '';
+            document.getElementById('memberPosition').value = '';
+            document.getElementById('memberBirthDate').value = '';
+            document.getElementById('memberEmail').value = '';
+        }
+
+        function calculateNumerologyCode(birthDate) {
+            const date = new Date(birthDate);
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+
+            const dayDigits = day.toString().split('').map(Number);
+            const monthDigits = month.toString().split('').map(Number);
+            const yearDigits = year.toString().split('').map(Number);
+
+            let daySum = dayDigits.reduce((a, b) => a + b, 0);
+            if (daySum >= 10) daySum = Math.floor(daySum / 10) + (daySum % 10);
+
+            let monthSum = monthDigits.reduce((a, b) => a + b, 0);
+            if (monthSum >= 10) monthSum = Math.floor(monthSum / 10) + (monthSum % 10);
+
+            let yearSum = yearDigits.reduce((a, b) => a + b, 0);
+            while (yearSum >= 10) {
+                yearSum = Math.floor(yearSum / 10) + (yearSum % 10);
+            }
+
+            let totalSum = daySum + monthSum + yearSum;
+            while (totalSum >= 10) {
+                totalSum = Math.floor(totalSum / 10) + (totalSum % 10);
+            }
+            return totalSum;
+        }
+
+        // Team Analysis Form Submission
+        document.getElementById('teamAnalysisForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Team members:', teamMembers); // Debug log
+            console.log('Complete members:', teamMembers.filter(member => member.name && member.position && member.birthDate )); // Debug log
+
+            if (isEditingMember) {
+                alert('Sila selesaikan pengeditan ahli semasa terlebih dahulu.');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const companyName = formData.get('companyName');
+            const teamName = formData.get('teamName');
+
+            // Filter only complete members
+            const completeMembers = teamMembers.filter(member => member.name && member.position && member.birthDate );
+
+            if (completeMembers.length < 2) {
+                alert('Sila pastikan sekurang-kurangnya 2 ahli pasukan mempunyai maklumat lengkap.');
+                return;
+            }
+
+            if (!companyName || !teamName) {
+                alert('Sila lengkapkan nama syarikat dan nama pasukan.');
+                return;
+            }
+
+            showLoading('team');
+
+            setTimeout(() => {
+                displayTeamAnalysis(companyName, teamName, completeMembers);
+                hideLoading();
+            }, 3000);
+        });
+
+        function displayTeamAnalysis(companyName, teamName, teamData) {
+            // Calculate team statistics
+            const codeDistribution = {};
+            const elementDistribution = {};
+            teamData.forEach(member => {
+                const code = member.numerologyCode;
+                const element = personalityData[code] ? personalityData[code].element : 'UNKNOWN';
+                codeDistribution[code] = (codeDistribution[code] || 0) + 1;
+                elementDistribution[element] = (elementDistribution[element] || 0) + 1;
+            });
+
+            // Calculate compatibility
+            const compatibilityPairs = [];
+            const conflictPairs = [];
+            for (let i = 0; i < teamData.length; i++) {
+                for (let j = i + 1; j < teamData.length; j++) {
+                    const member1 = teamData[i];
+                    const member2 = teamData[j];
+                    const code1 = member1.numerologyCode;
+                    const code2 = member2.numerologyCode;
+                    if (personalityData[code1] && personalityData[code1].compatibility.includes(code2)) {
+                        compatibilityPairs.push(member1.name + ' & ' + member2.name);
+                    } else {
+                        conflictPairs.push(member1.name + ' & ' + member2.name);
+                    }
+                }
+            }
+
+            // Store results data for PDF export
+            currentResultsData = { type: 'team', data: { companyName, teamName, teamData, codeDistribution, elementDistribution, compatibilityPairs, conflictPairs } };
+
+            const teamResultsHTML = `
+                <div style="background: var(--bg-card); backdrop-filter: blur(20px); border-radius: var(--border-radius-xl); padding: 40px; margin-bottom: 30px; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h2 style="color: var(--text-accent); margin: 0;">🏢 Analisis Pasukan: ${teamName}</h2>
+                        <button onclick="exportToPDF()" class="export-btn">📄 Export PDF</button>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 30px; font-size: 1.1rem;">${companyName}</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0;">
+                        <div style="text-align: center; padding: 25px; background: var(--bg-glass); border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: var(--text-accent); margin-bottom: 10px;">${teamData.length}</div>
+                            <div style="color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Ahli Pasukan</div>
+                        </div>
+                        <div style="text-align: center; padding: 25px; background: var(--bg-glass); border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: var(--text-accent); margin-bottom: 10px;">${Object.keys(elementDistribution).length}</div>
+                            <div style="color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Elemen Berbeza</div>
+                        </div>
+                        <div style="text-align: center; padding: 25px; background: var(--bg-glass); border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: var(--text-accent); margin-bottom: 10px;">${compatibilityPairs.length}</div>
+                            <div style="color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Pasangan Serasi</div>
+                        </div>
+                        <div style="text-align: center; padding: 25px; background: var(--bg-glass); border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                            <div style="font-size: 2.5rem; font-weight: bold; color: var(--text-accent); margin-bottom: 10px;">${conflictPairs.length}</div>
+                            <div style="color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Pasangan Konflik</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--text-accent); margin-top: 30px; margin-bottom: 20px;">📊 Taburan Kod Numerologi</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+                        ${Object.entries(codeDistribution).map(([code, count]) => `
+                            <div style="background: var(--bg-glass); padding: 15px 20px; border-radius: var(--border-radius-md); border: 1px solid var(--border-color); text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-accent);">${code}</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">(${count} ahli)</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <h3 style="color: var(--text-accent); margin-top: 30px; margin-bottom: 20px;">🔥 Taburan Elemen</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+                        ${Object.entries(elementDistribution).map(([element, count]) => `
+                            <span class="element-badge element-${element.toLowerCase()}" style="padding: 10px 18px;">
+                                ${element} (${count})
+                            </span>
+                        `).join('')}
+                    </div>
+
+                    <h3 style="color: var(--text-accent); margin-top: 30px; margin-bottom: 20px;">🤝 Potensi Keserasian Tinggi</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Pasangan ahli pasukan dengan potensi kerjasama yang baik:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        ${compatibilityPairs.length > 0 ? compatibilityPairs.map(pair => `<span style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; padding: 8px 15px; border-radius: 15px; font-size: 0.9rem; font-weight: 600;">${pair}</span>`).join('') : '<p style="color: #d97706;">Tiada pasangan yang mempunyai keserasian tinggi berdasarkan data.</p>'}
+                    </div>
+
+                    <h3 style="color: var(--text-accent); margin-top: 30px; margin-bottom: 20px;"> Konflik Potensi</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Pasangan ahli pasukan yang mungkin menghadapi cabaran komunikasi:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        ${conflictPairs.length > 0 ? conflictPairs.map(pair => `<span style="background: rgba(220, 38, 38, 0.15); border: 1px solid #dc2626; color: #ef4444; padding: 8px 15px; border-radius: 15px; font-size: 0.9rem; font-weight: 600;">${pair}</span>` ).join('') : '<p style="color: #10b981;">Semua ahli mempunyai potensi kerjasama yang baik!</p>' }
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border-radius: var(--border-radius-xl); padding: 40px; border: 1px solid var(--border-accent);">
+                    <h3 style="color: var(--text-accent); margin-bottom: 25px;">💡 Cadangan Pengoptimuman Pasukan</h3>
+                    <div style="display: grid; gap: 20px;">
+                        <div style="background: var(--bg-glass); border-radius: var(--border-radius-md); padding: 25px; border-left: 4px solid var(--text-accent);">
+                            <h4 style="color: var(--text-accent); margin-bottom: 15px;">🎯 Strategi Kepimpinan</h4>
+                            <p style="color: var(--text-secondary); line-height: 1.6;">Berdasarkan taburan kod numerologi, pasukan ini memerlukan pendekatan kepimpinan yang seimbang. ${Object.keys(codeDistribution).includes('1') ? 'Dengan kehadiran kod 1 (Ketulenan), ada pemimpin semula jadi dalam pasukan.' : 'Pasukan memerlukan arahan yang jelas dari pengurusan atasan.'}</p>
+                        </div>
+                        <div style="background: var(--bg-glass); border-radius: var(--border-radius-md); padding: 25px; border-left: 4px solid var(--text-accent);">
+                            <h4 style="color: var(--text-accent); margin-bottom: 15px;">🗣️ Komunikasi Berkesan</h4>
+                            <p style="color: var(--text-secondary); line-height: 1.6;">Untuk meningkatkan komunikasi, galakkan sesi perbincangan terbuka. ${Object.keys(elementDistribution).includes('FIRE') ? 'Ahli dengan elemen Api (FIRE) boleh memulakan perbincangan yang bersemangat.' : ''} ${Object.keys(elementDistribution).includes('WATER') ? 'Ahli dengan elemen Air (WATER) boleh memastikan suasana yang harmoni.' : ''}</p>
+                        </div>
+                        <div style="background: var(--bg-glass); border-radius: var(--border-radius-md); padding: 25px; border-left: 4px solid var(--text-accent);">
+                            <h4 style="color: var(--text-accent); margin-bottom: 15px;">🌱 Pembangunan Pasukan</h4>
+                            <p style="color: var(--text-secondary); line-height: 1.6;">Adakan aktiviti pembangunan pasukan yang menekankan kekuatan unik setiap ahli. ${Object.keys(codeDistribution).includes('5') ? 'Fokus pada aktiviti yang membenarkan kreativiti dan kebebasan.' : 'Fokus pada aktiviti yang menekankan struktur dan perancangan.'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('resultsSection').innerHTML = teamResultsHTML;
+            document.getElementById('resultsSection').style.display = 'grid';
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+
+        // PDF Export Function
+        async function exportToPDF() {
+            if (!currentResultsData) {
+                alert('Tiada data untuk dieksport ke PDF.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let yPosition = 20;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(22);
+            doc.setTextColor(30, 64, 175); // Dark blue accent
+
+            function checkPageBreak(heightNeeded) {
+                if (yPosition + heightNeeded > doc.internal.pageSize.height - 20) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+            }
+
+            if (currentResultsData.type === 'numerology') {
+                const { mainCode, fullName, formattedDate, personality } = currentResultsData.data;
+
+                // Title
+                doc.setFontSize(20);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Laporan Analisis Numerologi', 20, yPosition);
+                yPosition += 15;
+
+                // Personal Info
+                doc.setFontSize(14);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Nama: ${fullName}`, 20, yPosition);
+                yPosition += 10;
+                doc.text(`Tarikh Lahir: ${formattedDate}`, 20, yPosition);
+                yPosition += 10;
+                doc.text(`Kod Numerologi: ${mainCode}`, 20, yPosition);
+                yPosition += 10;
+                doc.text(`Personaliti: ${personality.title}`, 20, yPosition);
+                yPosition += 10;
+                doc.text(`Elemen: ${personality.element}`, 20, yPosition);
+                yPosition += 20;
+
+                // Strengths
+                checkPageBreak(40);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Kelebihan Utama:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                const strengthsLines = doc.splitTextToSize(personality.pro, 170);
+                doc.text(strengthsLines, 20, yPosition);
+                yPosition += strengthsLines.length * 5 + 10;
+
+                // Weaknesses
+                checkPageBreak(40);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Kelemahan Yang Perlu Diperbaiki:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                const weaknessLines = doc.splitTextToSize(personality.contra, 170);
+                doc.text(weaknessLines, 20, yPosition);
+                yPosition += weaknessLines.length * 5 + 10;
+
+                // Suggestions
+                checkPageBreak(40);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Cadangan Pembaikan:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                const suggestionLines = doc.splitTextToSize(personality.suggestion, 170);
+                doc.text(suggestionLines, 20, yPosition);
+                yPosition += suggestionLines.length * 5 + 20;
+
+                // Additional Info
+                checkPageBreak(60);
+                doc.setFontSize(14);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Maklumat Tambahan:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Keserasian: ${personality.compatibility.join(', ')}`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Nombor Bertuah: ${personality.luckyNumbers.join(', ')}`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Warna Bertuah: ${personality.luckyColors.join(', ')}`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Hari Bertuah: ${personality.luckyDays.join(', ')}`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Kerjaya Sesuai: ${personality.career}`, 20, yPosition);
+                yPosition += 20;
+
+            } else if (currentResultsData.type === 'mbti') {
+                const { type, name, email, percentages, mbtiData } = currentResultsData.data;
+
+                // Title
+                doc.setFontSize(20);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Laporan Analisis MBTI Personaliti', 20, yPosition);
+                yPosition += 15;
+
+                // Personal Info
+                doc.setFontSize(14);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Nama: ${name}`, 20, yPosition);
+                yPosition += 10;
+                doc.text(`Emel: ${email}`, 20, yPosition);
+                yPosition += 10;
+                doc.text(`Jenis MBTI: ${type} - ${mbtiData.name}`, 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                const descriptionLines = doc.splitTextToSize(mbtiData.description, 170);
+                doc.text(descriptionLines, 20, yPosition);
+                yPosition += descriptionLines.length * 5 + 20;
+
+                // Dimensions
+                checkPageBreak(50);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Dimensi Personaliti:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Extrovert vs Introvert: ${percentages.EI}%`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Sensing vs Intuition: ${percentages.SN}%`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Thinking vs Feeling: ${percentages.TF}%`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Judging vs Perceiving: ${percentages.JP}%`, 20, yPosition);
+                yPosition += 15;
+
+                // Strengths
+                checkPageBreak(40);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Kekuatan Utama:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                mbtiData.strengths.forEach(strength => {
+                    doc.text(`• ${strength}`, 20, yPosition);
+                    yPosition += 6;
+                });
+                yPosition += 10;
+
+                // Weaknesses
+                checkPageBreak(40);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Area Pembaikan:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                mbtiData.weaknesses.forEach(weakness => {
+                    doc.text(`• ${weakness}`, 20, yPosition);
+                    yPosition += 6;
+                });
+                yPosition += 10;
+
+            } else if (currentResultsData.type === 'team') {
+                const { companyName, teamName, teamData, codeDistribution, elementDistribution, compatibilityPairs, conflictPairs } = currentResultsData.data;
+
+                // Title
+                doc.setFontSize(20);
+                doc.setTextColor(37, 99, 235);
+                doc.text(`Laporan Analisis Pasukan: ${teamName}`, 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(14);
+                doc.text(`${companyName}`, 20, yPosition);
+                yPosition += 20;
+
+                // Team Overview
+                checkPageBreak(50);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Gambaran Keseluruhan Pasukan:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Jumlah Ahli: ${teamData.length}`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Elemen Berbeza: ${Object.keys(elementDistribution).length}`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Pasangan Serasi: ${compatibilityPairs.length}`, 20, yPosition);
+                yPosition += 8;
+                doc.text(`Pasangan Konflik: ${conflictPairs.length}`, 20, yPosition);
+                yPosition += 20;
+
+                // Numerology Code Distribution
+                checkPageBreak(40 + Object.keys(codeDistribution).length * 8);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Taburan Kod Numerologi:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                Object.entries(codeDistribution).forEach(([code, count]) => {
+                    doc.text(`• Kod ${code}: ${count} ahli`, 20, yPosition);
+                    yPosition += 6;
+                });
+                yPosition += 10;
+
+                // Element Distribution
+                checkPageBreak(40 + Object.keys(elementDistribution).length * 8);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Taburan Elemen:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                Object.entries(elementDistribution).forEach(([element, count]) => {
+                    doc.text(`• ${element}: ${count} ahli`, 20, yPosition);
+                    yPosition += 6;
+                });
+                yPosition += 10;
+
+                // Compatibility and Conflict
+                checkPageBreak(40 + Math.max(compatibilityPairs.length, conflictPairs.length) * 8);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Potensi Keserasian Tinggi:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                if (compatibilityPairs.length > 0) {
+                    compatibilityPairs.forEach(pair => {
+                        doc.text(`• ${pair}`, 20, yPosition);
+                        yPosition += 6;
+                    });
+                } else {
+                    doc.text('Tiada pasangan yang mempunyai keserasian tinggi berdasarkan data.', 20, yPosition);
+                    yPosition += 6;
+                }
+                yPosition += 10;
+
+                checkPageBreak(40 + Math.max(compatibilityPairs.length, conflictPairs.length) * 8);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Konflik Potensi:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                if (conflictPairs.length > 0) {
+                    conflictPairs.forEach(pair => {
+                        doc.text(`• ${pair}`, 20, yPosition);
+                        yPosition += 6;
+                    });
+                } else {
+                    doc.text('Semua ahli mempunyai potensi kerjasama yang baik!', 20, yPosition);
+                    yPosition += 6;
+                }
+                yPosition += 10;
+
+                // Optimization Suggestions
+                checkPageBreak(100);
+                doc.setFontSize(16);
+                doc.setTextColor(37, 99, 235);
+                doc.text('Cadangan Pengoptimuman Pasukan:', 20, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+
+                doc.text('Strategi Kepimpinan:', 25, yPosition);
+                yPosition += 6;
+                let suggestionLines = doc.splitTextToSize(`Berdasarkan taburan kod numerologi, pasukan ini memerlukan pendekatan kepimpinan yang seimbang. ${Object.keys(codeDistribution).includes('1') ? 'Dengan kehadiran kod 1 (Ketulenan), ada pemimpin semula jadi dalam pasukan.' : 'Pasukan memerlukan arahan yang jelas dari pengurusan atasan.'}`, 160);
+                doc.text(suggestionLines, 25, yPosition);
+                yPosition += suggestionLines.length * 5 + 10;
+
+                doc.text('Komunikasi Berkesan:', 25, yPosition);
+                yPosition += 6;
+                suggestionLines = doc.splitTextToSize(`Untuk meningkatkan komunikasi, galakkan sesi perbincangan terbuka. ${Object.keys(elementDistribution).includes('FIRE') ? 'Ahli dengan elemen Api (FIRE) boleh memulakan perbincangan yang bersemangat.' : ''} ${Object.keys(elementDistribution).includes('WATER') ? 'Ahli dengan elemen Air (WATER) boleh memastikan suasana yang harmoni.' : ''}`, 160);
+                doc.text(suggestionLines, 25, yPosition);
+                yPosition += suggestionLines.length * 5 + 10;
+
+                doc.text('Pembangunan Pasukan:', 25, yPosition);
+                yPosition += 6;
+                suggestionLines = doc.splitTextToSize(`Adakan aktiviti pembangunan pasukan yang menekankan kekuatan unik setiap ahli. ${Object.keys(codeDistribution).includes('5') ? 'Fokus pada aktiviti yang membenarkan kreativiti dan kebebasan.' : 'Fokus pada aktiviti yang menekankan struktur dan perancangan.'}`, 160);
+                doc.text(suggestionLines, 25, yPosition);
+                yPosition += suggestionLines.length * 5 + 10;
+            }
+
+            doc.save('Laporan_Analisis_Personaliti.pdf');
+        }
+
+        // Global Reset Function
+        function resetAnalysis() {
+            // Hide results section and reset button
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'none';
+
+            // Show default tab (numerology)
+            switchTab(null, 'numerology'); // Passing null for event as it's not a click event
+
+            // Reset forms
+            document.getElementById('metafizikForm').reset();
+            
+            // Reset MBTI quiz
+            currentQuestionIndex = 0;
+            mbtiAnswers = {};
+            initializeMBTIQuiz();
+            
+            // Reset team data
+            teamMembers = [];
+            isEditingMember = false;
+            editingMemberIndex = -1;
+            document.getElementById('currentMemberForm').style.display = 'none';
+            updateMemberList();
+            
+            // Reset results data
+            currentResultsData = null;
+            
+            // Smooth scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (isEditingMember) {
+                    cancelMemberEdit();
+                } else if (document.getElementById('currentMemberForm').style.display === 'block') {
+                    cancelMemberEdit();
+                }
+            }
+        });
+
+        // Add smooth scrolling for better UX
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const particles = document.querySelector('.cosmic-particles');
+            if (particles) {
+                particles.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+        });
+
+    </script>
+</body>
+</html>
